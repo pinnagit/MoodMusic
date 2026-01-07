@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodMusic Raw</title>
+</head>
+<body>
+    <h1>MoodMusic</h1><h2>(demo)</h2>
+    <!-- 1. CONFIGURAZIONE API -->
+    <h3>1. Configurazione</h3>
+    <label>API Key OpenWeather:</label>
+    <input type="text" id="apiKeyInput" placeholder="Incolla qui la tua API Key">
+    <small>(<a href="https://home.openweathermap.org/api_keys" target="_blank">Prendila qui gratis</a> o lascia vuoto per modalità Demo)</small>
+    <br><br>
+    <!-- 2. INPUT METEO -->
+    <h3>2. Meteo</h3>
+    <label>Città:</label>
+    <input type="text" id="cityInput" placeholder="Es. Roma">
+    <button onclick="getRealWeather()">Cerca Meteo</button>
+    
+    <div id="weatherOutput" style="margin-top: 10px; font-weight: bold;">
+        Stato: In attesa...
+    </div>
+    <hr>
+    <!-- 3. SCELTA MOOD -->
+    <h3>3. Scegli Mood</h3>
+    <p>Clicca un pulsante per generare la playlist:</p>
+    
+    <button onclick="setMood('happy')">😄 Felice</button>
+    <button onclick="setMood('chill')">😌 Relax</button>
+    <button onclick="setMood('sad')">😔 Triste</button>
+    <button onclick="setMood('energetic')">⚡ Carico</button>
+    <hr>
+    <!-- 4. PLAYER -->
+    <h3>4. Player</h3>
+    <p id="resultText"></p>
+    <!-- Iframe Spotify standard -->
+    <iframe id="spotifyPlayer" style="border-radius:12px" src="" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    <script src="script.js"></script>
+</body>
+</html>
