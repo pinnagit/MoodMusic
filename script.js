@@ -1,5 +1,6 @@
 // VARIABILI STATO
-let currentVibe = 'sunny'; // Default se l'utente non cerca il meteo
+let currentVibe = '';
+let meteo=false // Default se l'utente non cerca il meteo
 
 // DATABASE PLAYLIST (Mood + Meteo)
 const playlists = {
@@ -26,7 +27,6 @@ const playlists = {
 
 // 1. FUNZIONE METEO (INTELLIGENTE: REALE O DEMO)
 async function getRealWeather() {
-    const apiKey = document.getElementById('apiKeyInput').value.trim();
     const city = document.getElementById('cityInput').value.trim();
     const output = document.getElementById('weatherOutput');
 
@@ -37,36 +37,9 @@ async function getRealWeather() {
 
     output.innerText = "Caricamento...";
 
-    // A. MODALITÀ DEMO (Se non c'è Key)
-    if (!apiKey) {
-        console.log("No Key: Uso Simulazione");
-        // Simula ritardo di rete
-        setTimeout(() => {
-            // Simuliamo tre casi: Sole, Pioggia, Freddo Gelo
-            const rand = Math.random();
-            let temp, condition, desc;
 
-            if (rand < 0.3) {
-                // Caso FREDDO (30% probabilità)
-                temp = Math.floor(Math.random() * 5) - 10; // Da -10 a -5
-                condition = 'cold';
-                desc = 'Gelo Polare (Simulato)';
-            } else {
-                // Altrimenti Sole o Pioggia
-                const isRain = Math.random() > 0.5; 
-                temp = Math.floor(Math.random() * 30);
-                condition = isRain ? 'rain' : 'sunny';
-                desc = isRain ? 'Pioggia (Simulata)' : 'Soleggiato (Simulato)';
-            }
-            
-            updateState(condition, temp, desc);
-        }, 500);
-        return;
-    }
-
-    // B. MODALITÀ REALE (Se c'è Key)
     try {
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=it`;
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=d7cf6e05bb02b3e99058f0c599353815&units=metric&lang=it`;
         const response = await fetch(url);
         
         if (!response.ok) throw new Error("Città non trovata o Key errata");
@@ -81,7 +54,7 @@ async function getRealWeather() {
         // Logica Vibe: Priorità alla Temperatura < 0
         let vibe = 'sunny';
         
-        if (temp < 0) {
+        if (temp < 5) {
             vibe = 'cold';
         } else if (conditionId < 700) {
             vibe = 'rain'; // 200-600 sono pioggia/neve (se sopra zero)
@@ -100,11 +73,14 @@ function updateState(vibe, temp, desc) {
     currentVibe = vibe;
     const output = document.getElementById('weatherOutput');
     output.innerText = `Meteo: ${temp}°C, ${desc}. (Vibe impostato: ${currentVibe.toUpperCase()})`;
+    meteo=true
 }
 
 
 // 2. FUNZIONE SCELTA MOOD E PLAYER
 function setMood(mood) {
+    
+
     // Crea la chiave combinata (es. 'sad_rain')
     const key = `${mood}_${currentVibe}`;
     
