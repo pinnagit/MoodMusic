@@ -1,6 +1,5 @@
 # MoodMusic
 MoodMusic è un’applicazione web che genera playlist Spotify basate sul **tuo umore** oppure sul **meteo reale della tua città**.  
-Un progetto semplice ma d’impatto, pensato per rendere la musica più personale, contestuale e divertente.
 ## Funzionalità principali
 ### Playlist basate sul Mood
 L’utente può scegliere tra 4 stati d’animo:
