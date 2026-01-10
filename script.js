@@ -89,7 +89,7 @@ function setMood(mood) {
     
     // Fallback se non esiste
     if (!playlistId) playlistId = playlists['chill_sunny'];
-
+    //DA AGGIUNGERE METODO DI GENERAZIONE RANDOM DI PLAYLIST
     // Costruisci URL Embed
     const embedUrl = `https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator`;
 
@@ -97,3 +97,4 @@ function setMood(mood) {
     document.getElementById('spotifyPlayer').src = embedUrl;
     document.getElementById('resultText').innerText = `Riproducendo per Mood: ${mood.toUpperCase()} + Meteo: ${currentVibe.toUpperCase()}`;
 }
+
