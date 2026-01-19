@@ -3,34 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoodMusic Raw</title>
+    <title>MoodMusic</title>
 </head>
 <body>
-    <h1>MoodMusic</h1><h2>(demo)</h2>
-    <!-- 1. INPUT METEO -->
-    <h3>1. Meteo</h3>
-    <label>Città:</label>
-    <input type="text" id="cityInput" placeholder="Es. Roma">
-    <button onclick="getRealWeather()">Cerca Meteo</button>
-    
-    <div id="weatherOutput" style="margin-top: 10px; font-weight: bold;">
-        Stato: In attesa...
+    <h1>MoodMusic</h1>
+    <h2>(demo)</h2>
+
+    <!-- TOGGLE METEO -->
+    <div id="weatherToggle">
+        <label>Usare il meteo?</label>
+        <label><input type="radio" name="useWeather" value="yes" checked> Sì</label>
+        <label><input type="radio" name="useWeather" value="no"> No</label>
     </div>
+
+    <!-- 1. INPUT METEO -->
+    <section id="meteoSection">
+        <h3 id="meteoTitle">1. Meteo</h3>
+        <label>Città:</label>
+        <input type="text" id="cityInput" placeholder="Es. Roma">
+        <button id="btnMeteo">Cerca Meteo</button>
+        <div id="weatherOutput">Stato: In attesa...</div>
+        <hr>
+    </section>
+
+    <!-- 2. SCELTA GENERI MUSICALI -->
+    <h3 id="genresTitle">2. Generi Musicali</h3>
+    <p>Seleziona uno o più generi (opzionale):</p>
+    <div id="genreContainer">
+        <label><input type="checkbox" name="genre" value="pop"> Pop</label>
+        <label><input type="checkbox" name="genre" value="rock"> Rock</label>
+        <label><input type="checkbox" name="genre" value="lofi"> Lofi</label>
+        <label><input type="checkbox" name="genre" value="rap"> Rap</label>
+        <label><input type="checkbox" name="genre" value="jazz"> Jazz</label>
+        <label><input type="checkbox" name="genre" value="electronic"> Electronic</label>
+        <label><input type="checkbox" name="genre" value="indie"> Indie</label>
+        <label><input type="checkbox" name="genre" value="rnb"> R&B</label>
+    </div>
+    <div id="selectedGenres">Nessun genere selezionato</div>
     <hr>
-    <!-- 2. SCELTA MOOD -->
-    <h3>2. Scegli Mood</h3>
+
+    <!-- 3. SCELTA MOOD -->
+    <h3 id="moodTitle">3. Scegli Mood</h3>
     <p>Clicca un pulsante per generare la playlist:</p>
-    
-    <button onclick="setMood('happy')">😄 Felice</button>
-    <button onclick="setMood('chill')">😌 Relax</button>
-    <button onclick="setMood('sad')">😔 Triste</button>
-    <button onclick="setMood('energetic')">⚡ Carico</button>
+    <button class="mood-btn" data-mood="happy">😄 Felice</button>
+    <button class="mood-btn" data-mood="chill">😌 Relax</button>
+    <button class="mood-btn" data-mood="sad">😔 Triste</button>
+    <button class="mood-btn" data-mood="energetic">⚡ Carico</button>
     <hr>
-    <!-- 3. PLAYER -->
-    <h3>3. Player</h3>
-    <p id="resultText"></p>
-    <!-- Iframe Spotify standard -->
+
+    <!-- 4. PLAYER -->
+    <h3 id="playerTitle">4. Player</h3>
+    <p id="resultText">Seleziona un mood per iniziare...</p>
     <iframe id="spotifyPlayer" style="border-radius:12px" src="" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+
     <script src="script.js"></script>
 </body>
 </html>
