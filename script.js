@@ -1,6 +1,7 @@
 // VARIABILI STATO
 let currentVibe = 'sunny';
 let meteo = false;
+let useWeather = true;
 
 // DATABASE PLAYLIST (Mood + Meteo + Generi)
 const playlists = {
@@ -158,8 +159,34 @@ function updateGenreDisplay() {
     }
 }
 
+// FUNZIONE: Applica toggle meteo
+function applyWeatherToggle() {
+    const meteoSection = document.getElementById('meteoSection');
+    const meteoTitle = document.getElementById('meteoTitle');
+    const genresTitle = document.getElementById('genresTitle');
+    const moodTitle = document.getElementById('moodTitle');
+    const playerTitle = document.getElementById('playerTitle');
+    
+    if (useWeather) {
+        meteoSection.style.display = '';
+        meteoTitle.innerText = '1. Meteo';
+        genresTitle.innerText = '2. Generi Musicali';
+        moodTitle.innerText = '3. Scegli Mood';
+        playerTitle.innerText = '4. Player';
+    } else {
+        meteoSection.style.display = 'none';
+        genresTitle.innerText = '1. Generi Musicali';
+        moodTitle.innerText = '2. Scegli Mood';
+        playerTitle.innerText = '3. Player';
+        currentVibe = 'sunny';
+        meteo = false;
+    }
+}
+
 // FUNZIONE METEO
 async function getRealWeather() {
+    if (!useWeather) return;
+    
     const city = document.getElementById('cityInput').value.trim();
     const output = document.getElementById('weatherOutput');
 
@@ -241,7 +268,8 @@ function setMood(mood) {
         `https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator`;
     
     // Mostra risultato
-    let result = `Mood: ${mood.toUpperCase()} | Meteo: ${currentVibe.toUpperCase() || 'DEFAULT'}`;
+    const meteoLabel = useWeather ? (currentVibe.toUpperCase() || 'DEFAULT') : 'OMESSO';
+    let result = `Mood: ${mood.toUpperCase()} | Meteo: ${meteoLabel}`;
     if (genres.length > 0) {
         result += ` | Generi: ${genres.join(', ')}`;
     }
@@ -252,6 +280,31 @@ function setMood(mood) {
 // INIZIALIZZAZIONE - Event Listeners
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
+    
+    // Leggi localStorage
+    const saved = localStorage.getItem('mm_useWeather');
+    useWeather = (saved !== 'no');
+    
+    // Sincronizza radio
+    const radioYes = document.querySelector('input[name="useWeather"][value="yes"]');
+    const radioNo = document.querySelector('input[name="useWeather"][value="no"]');
+    if (useWeather) {
+        radioYes.checked = true;
+    } else {
+        radioNo.checked = true;
+    }
+    
+    // Applica stato iniziale
+    applyWeatherToggle();
+    
+    // Event listeners radio useWeather
+    document.querySelectorAll('input[name="useWeather"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            useWeather = (this.value === 'yes');
+            localStorage.setItem('mm_useWeather', useWeather ? 'yes' : 'no');
+            applyWeatherToggle();
+        });
+    });
     
     // Bottone Meteo
     document.getElementById('btnMeteo').addEventListener('click', getRealWeather);
