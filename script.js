@@ -1,165 +1,249 @@
-// VARIABILI STATO
 let currentVibe = 'sunny';
 let meteo = false;
 let useWeather = true;
 
-// DATABASE PLAYLIST (Mood + Meteo + Generi)
-const playlists = {
-    // PLAYLIST BASE (Mood + Meteo)
-    'happy_sunny': '37i9dQZF1DXdPec7aLTmlC',
-    'happy_rain': '37i9dQZF1DX3rxVfdh1f5u',
-    'happy_cold': '37i9dQZF1DX9uKNf5jGX6m',
-    'chill_sunny': '37i9dQZF1DX4WYpdgoIcn6',
-    'chill_rain': '37i9dQZF1DX889U0CL85jj',
-    'chill_cold': '37i9dQZF1DX4H7FFUM2osB',
-    'sad_sunny': '37i9dQZF1DX3YSRoSdA634',
-    'sad_rain': '37i9dQZF1DX7qK8ma5wgG1',
-    'sad_cold': '37i9dQZF1DWSqBruwoIXkA',
-    'energetic_sunny': '37i9dQZF1DX76Wlfdnj7AP',
-    'energetic_rain': '37i9dQZF1DX0HRj9P7NxeE',
-    'energetic_cold': '37i9dQZF1DX76Wlfdnj7AP',
+const musicTags = {
+    // --- BASE (SENZA GENERE SPECIFICO) ---
+    'happy_sunny': 'summer hits',
+    'happy_rain': 'acoustic pop',
+    'happy_cold': 'christmas',
+    'chill_sunny': 'chillout',
+    'chill_rain': 'lo-fi',
+    'chill_cold': 'acoustic',
+    'sad_sunny': 'melancholy',
+    'sad_rain': 'sad',
+    'sad_cold': 'indie',
+    'energetic_sunny': 'dance',
+    'energetic_rain': 'rock',
+    'energetic_cold': 'metal',
+
+    // --- POP ---
+    'happy_sunny_pop': 'summer pop',
+    'happy_rain_pop': 'acoustic pop',
+    'happy_cold_pop': 'indie pop',
+    'chill_sunny_pop': 'chill pop',
+    'chill_rain_pop': 'soft pop',
+    'chill_cold_pop': 'dream pop',
+    'sad_sunny_pop': 'sad pop',
+    'sad_rain_pop': 'ballads',
+    'sad_cold_pop': 'piano pop',
+    'energetic_sunny_pop': 'dance pop',
+    'energetic_rain_pop': 'power pop',
+    'energetic_cold_pop': 'electropop',
+
+    // --- ROCK ---
+    'happy_sunny_rock': 'classic rock',
+    'happy_rain_rock': 'soft rock',
+    'happy_cold_rock': 'folk rock',
+    'chill_sunny_rock': 'yacht rock',
+    'chill_rain_rock': 'post-rock',
+    'chill_cold_rock': 'slow rock',
+    'sad_sunny_rock': 'alternative rock',
+    'sad_rain_rock': 'emo',
+    'sad_cold_rock': 'grunge',
+    'energetic_sunny_rock': 'hard rock',
+    'energetic_rain_rock': 'punk rock',
+    'energetic_cold_rock': 'industrial rock',
+
+    // --- LOFI ---
+    'happy_sunny_lofi': 'upbeat lofi',
+    'happy_rain_lofi': 'lofi hip hop',
+    'happy_cold_lofi': 'winter lofi',
+    'chill_sunny_lofi': 'chillhop',
+    'chill_rain_lofi': 'lofi beats',
+    'chill_cold_lofi': 'sleep lofi',
+    'sad_sunny_lofi': 'nostalgic lofi',
+    'sad_rain_lofi': 'sad lofi',
+    'sad_cold_lofi': 'lonely lofi',
+    'energetic_sunny_lofi': 'jazzhop',
+    'energetic_rain_lofi': 'lofi rap',
+    'energetic_cold_lofi': 'dark lofi',
+
+    // --- RAP/HIP-HOP ---
+    'happy_sunny_rap': 'party rap',
+    'happy_rain_rap': 'conscious hip hop',
+    'happy_cold_rap': 'old school hip hop',
+    'chill_sunny_rap': 'jazz rap',
+    'chill_rain_rap': 'cloud rap',
+    'chill_cold_rap': 'lo-fi rap',
+    'sad_sunny_rap': 'emotional rap',
+    'sad_rain_rap': 'sad rap',
+    'sad_cold_rap': 'dark trap',
+    'energetic_sunny_rap': 'trap',
+    'energetic_rain_rap': 'hardcore hip hop',
+    'energetic_cold_rap': 'drill',
+
+    // --- JAZZ ---
+    'happy_sunny_jazz': 'acid jazz',
+    'happy_rain_jazz': 'smooth jazz',
+    'happy_cold_jazz': 'christmas jazz',
+    'chill_sunny_jazz': 'bossa nova',
+    'chill_rain_jazz': 'cool jazz',
+    'chill_cold_jazz': 'dark jazz',
+    'sad_sunny_jazz': 'blues',
+    'sad_rain_jazz': 'noir jazz',
+    'sad_cold_jazz': 'sad jazz',
+    'energetic_sunny_jazz': 'swing',
+    'energetic_rain_jazz': 'bebop',
+    'energetic_cold_jazz': 'fusion',
+
+    // --- ELECTRONIC ---
+    'happy_sunny_electronic': 'house',
+    'happy_rain_electronic': 'downtempo',
+    'happy_cold_electronic': 'synthpop',
+    'chill_sunny_electronic': 'ambient',
+    'chill_rain_electronic': 'trip-hop',
+    'chill_cold_electronic': 'idm',
+    'sad_sunny_electronic': 'future garage',
+    'sad_rain_electronic': 'witch house',
+    'sad_cold_electronic': 'dark ambient',
+    'energetic_sunny_electronic': 'edm',
+    'energetic_rain_electronic': 'techno',
+    'energetic_cold_electronic': 'drum and bass',
+
+    // --- INDIE ---
+    'happy_sunny_indie': 'indie pop',
+    'happy_rain_indie': 'indie folk',
+    'happy_cold_indie': 'folktronica',
+    'chill_sunny_indie': 'bedroom pop',
+    'chill_rain_indie': 'shoegaze',
+    'chill_cold_indie': 'slowcore',
+    'sad_sunny_indie': 'midwest emo',
+    'sad_rain_indie': 'sad indie',
+    'sad_cold_indie': 'indie rock',
+    'energetic_sunny_indie': 'indie dance',
+    'energetic_rain_indie': 'garage rock',
+    'energetic_cold_indie': 'post-punk',
+
+    // --- R&B ---
+    'happy_sunny_rnb': 'neo-soul',
+    'happy_rain_rnb': 'contemporary r&b',
+    'happy_cold_rnb': 'soul',
+    'chill_sunny_rnb': 'quiet storm',
+    'chill_rain_rnb': 'alternative r&b',
+    'chill_cold_rnb': 'slow jams',
+    'sad_sunny_rnb': 'blues',
+    'sad_rain_rnb': 'sad r&b',
+    'sad_cold_rnb': 'dark r&b',
+    'energetic_sunny_rnb': 'new jack swing',
+    'energetic_rain_rnb': 'funk',
+    'energetic_cold_rnb': 'motown',
+
+    // --- METAL ---
+    'happy_sunny_metal': 'glam metal',
+    'happy_rain_metal': 'symphonic metal',
+    'happy_cold_metal': 'power metal',
+    'chill_sunny_metal': 'stoner rock',
+    'chill_rain_metal': 'doom metal',
+    'chill_cold_metal': 'post-metal',
+    'sad_sunny_metal': 'gothic metal',
+    'sad_rain_metal': 'dsbm',
+    'sad_cold_metal': 'black metal',
+    'energetic_sunny_metal': 'heavy metal',
+    'energetic_rain_metal': 'nu metal',
+    'energetic_cold_metal': 'thrash metal',
+
+    // --- CLASSICA ---
+    'happy_sunny_classical': 'baroque',
+    'happy_rain_classical': 'romantic era',
+    'happy_cold_classical': 'waltz',
+    'chill_sunny_classical': 'impressionism',
+    'chill_rain_classical': 'minimalism',
+    'chill_cold_classical': 'piano solo',
+    'sad_sunny_classical': 'opera',
+    'sad_rain_classical': 'adagio',
+    'sad_cold_classical': 'requiem',
+    'energetic_sunny_classical': 'symphony',
+    'energetic_rain_classical': 'concerto',
+    'energetic_cold_classical': 'modern classical',
+
+    // --- METEO DISATTIVATO ---
+    'happy': 'hits',
+    'chill': 'chillout',
+    'sad': 'sad songs',
+    'energetic': 'workout',
 
     // POP
-    'happy_sunny_pop': '37i9dQZF1DXarRysLJmuju',
-    'happy_rain_pop': '37i9dQZF1DX1ngEVM0lKrb',
-    'happy_cold_pop': '37i9dQZF1DX4dyzvuaRJ0n',
-    'chill_sunny_pop': '37i9dQZF1DX6R7QUWePReA',
-    'chill_rain_pop': '37i9dQZF1DWTwnEm1IYyoj',
-    'chill_cold_pop': '37i9dQZF1DX4AyFl3yqHeK',
-    'sad_sunny_pop': '37i9dQZF1DX7qK8ma5wgG1',
-    'sad_rain_pop': '37i9dQZF1DX7gIoKXt0gmx',
-    'sad_cold_pop': '37i9dQZF1DWZUTt0fNaCPB',
-    'energetic_sunny_pop': '37i9dQZF1DX0b1hHYQtJjp',
-    'energetic_rain_pop': '37i9dQZF1DX6aTaZa0K6VA',
-    'energetic_cold_pop': '37i9dQZF1DWY4xHQp97fN6',
+    'happy_pop': 'pop hits',
+    'chill_pop': 'chill pop',
+    'sad_pop': 'sad pop',
+    'energetic_pop': 'dance pop',
 
     // ROCK
-    'happy_sunny_rock': '37i9dQZF1DWXRqgorJj26U',
-    'happy_rain_rock': '37i9dQZF1DX9wa6XirBPv8',
-    'happy_cold_rock': '37i9dQZF1DWWxPM4nWdhyI',
-    'chill_sunny_rock': '37i9dQZF1DX08mhnhv6g9b',
-    'chill_rain_rock': '37i9dQZF1DWZryfp6NSvtz',
-    'chill_cold_rock': '37i9dQZF1DX4E3UdUs7fUx',
-    'sad_sunny_rock': '37i9dQZF1DX4SrOBCjlfVi',
-    'sad_rain_rock': '37i9dQZF1DWVpCVxPAhVYW',
-    'sad_cold_rock': '37i9dQZF1DX59NCqCqJtoH',
-    'energetic_sunny_rock': '37i9dQZF1DWWOaP4H0w5b0',
-    'energetic_rain_rock': '37i9dQZF1DX11otjEEadDh',
-    'energetic_cold_rock': '37i9dQZF1DX3LyU0mhfqgP',
+    'happy_rock': 'classic rock',
+    'chill_rock': 'soft rock',
+    'sad_rock': 'ballads',
+    'energetic_rock': 'hard rock',
 
     // LOFI
-    'happy_sunny_lofi': '37i9dQZF1DWWQRwui0ExPn',
-    'happy_rain_lofi': '37i9dQZF1DX8Uebhn9wzrS',
-    'happy_cold_lofi': '37i9dQZF1DXc8kgYqQLMfH',
-    'chill_sunny_lofi': '37i9dQZF1DX4H7FFUM2osB',
-    'chill_rain_lofi': '37i9dQZF1DX36Xw4IJIVKA',
-    'chill_cold_lofi': '37i9dQZF1DXa1rZf8gLhyz',
-    'sad_sunny_lofi': '37i9dQZF1DX3YSRoSdA634',
-    'sad_rain_lofi': '37i9dQZF1DX7Jl5KP2eZaS',
-    'sad_cold_lofi': '37i9dQZF1DX5trt9i14X7j',
-    'energetic_sunny_lofi': '37i9dQZF1DX6VdMW310YC7',
-    'energetic_rain_lofi': '37i9dQZF1DX8NTLI2TtZa6',
-    'energetic_cold_lofi': '37i9dQZF1DWUraJYejk11q',
+    'happy_lofi': 'happy lofi',
+    'chill_lofi': 'lofi beats',
+    'sad_lofi': 'sad lofi',
+    'energetic_lofi': 'lofi house',
 
     // RAP
-    'happy_sunny_rap': '37i9dQZF1DX0XUsuxWHRQd',
-    'happy_rain_rap': '37i9dQZF1DX6GwdWRQMQpq',
-    'happy_cold_rap': '37i9dQZF1DWY4xHQp97fN6',
-    'chill_sunny_rap': '37i9dQZF1DX9oh43oAzkyx',
-    'chill_rain_rap': '37i9dQZF1DX0A5xMzWpSSA',
-    'chill_cold_rap': '37i9dQZF1DWTwzVdyRpXNF',
-    'sad_sunny_rap': '37i9dQZF1DX7gIoKXt0gmx',
-    'sad_rain_rap': '37i9dQZF1DX2pSTOxoPbx9',
-    'sad_cold_rap': '37i9dQZF1DWW293M8GSBpq',
-    'energetic_sunny_rap': '37i9dQZF1DX4SrOBCjlfVi',
-    'energetic_rain_rap': '37i9dQZF1DX0SmFt3WbGbE',
-    'energetic_cold_rap': '37i9dQZF1DX6J5NfMJS675',
+    'happy_rap': 'hip hop party',
+    'chill_rap': 'chill rap',
+    'sad_rap': 'sad rap',
+    'energetic_rap': 'hype rap',
 
     // JAZZ
-    'happy_sunny_jazz': '37i9dQZF1DX0SM0LYsmbMT',
-    'happy_rain_jazz': '37i9dQZF1DX4wta20PHgwo',
-    'happy_cold_jazz': '37i9dQZF1DWVqfgj8NZEp1',
-    'chill_sunny_jazz': '37i9dQZF1DX4wta20PHgwo',
-    'chill_rain_jazz': '37i9dQZF1DWS1NK42Lma8T',
-    'chill_cold_jazz': '37i9dQZF1DX2vYju3i0lNX',
-    'sad_sunny_jazz': '37i9dQZF1DX1s9knjP51Oa',
-    'sad_rain_jazz': '37i9dQZF1DXbLMw3QZ7sa4',
-    'sad_cold_jazz': '37i9dQZF1DX8ymr6UES7vc',
-    'energetic_sunny_jazz': '37i9dQZF1DWUb4EaAomqTi',
-    'energetic_rain_jazz': '37i9dQZF1DX7YCknf2jT6s',
-    'energetic_cold_jazz': '37i9dQZF1DX5z4dgJ9MxJz',
+    'happy_jazz': 'swing',
+    'chill_jazz': 'smooth jazz',
+    'sad_jazz': 'blues',
+    'energetic_jazz': 'big band',
 
     // ELECTRONIC
-    'happy_sunny_electronic': '37i9dQZF1DX4dyzvuaRJ0n',
-    'happy_rain_electronic': '37i9dQZF1DX8tZsk68tuDw',
-    'happy_cold_electronic': '37i9dQZF1DX1kCIzMYtzum',
-    'chill_sunny_electronic': '37i9dQZF1DX2TRYkJECvfC',
-    'chill_rain_electronic': '37i9dQZF1DX3Kdv0IChEm6',
-    'chill_cold_electronic': '37i9dQZF1DWYoYGBbGKurt',
-    'sad_sunny_electronic': '37i9dQZF1DX2pSTOxoPbx9',
-    'sad_rain_electronic': '37i9dQZF1DX5IDTimEWoTd',
-    'sad_cold_electronic': '37i9dQZF1DWX3SoTqhs2rq',
-    'energetic_sunny_electronic': '37i9dQZF1DX5Q27plkaOQ3',
-    'energetic_rain_electronic': '37i9dQZF1DX0HRj9P7NxeE',
-    'energetic_cold_electronic': '37i9dQZF1DX4eRPd9frC1m',
+    'happy_electronic': 'edm',
+    'chill_electronic': 'downtempo',
+    'sad_electronic': 'future garage',
+    'energetic_electronic': 'house',
 
     // INDIE
-    'happy_sunny_indie': '37i9dQZF1DX2Nc3B70tvez',
-    'happy_rain_indie': '37i9dQZF1DWWEcRhUuZYYZ',
-    'happy_cold_indie': '37i9dQZF1DX26DKvjp0s9M',
-    'chill_sunny_indie': '37i9dQZF1DX4E3UdUs7fUx',
-    'chill_rain_indie': '37i9dQZF1DWVFJtzvDHN4L',
-    'chill_cold_indie': '37i9dQZF1DX6OgmB2fwLGd',
-    'sad_sunny_indie': '37i9dQZF1DWSqBruwoIXkA',
-    'sad_rain_indie': '37i9dQZF1DX2sUQwD7tbmL',
-    'sad_cold_indie': '37i9dQZF1DX59NCqCqJtoH',
-    'energetic_sunny_indie': '37i9dQZF1DWWEcRhUuZYYZ',
-    'energetic_rain_indie': '37i9dQZF1DXXRqgorJj26U',
-    'energetic_cold_indie': '37i9dQZF1DX3LyU0mhfqgP',
+    'happy_indie': 'indie pop',
+    'chill_indie': 'indie folk',
+    'sad_indie': 'indie rock',
+    'energetic_indie': 'indie dance',
 
-    // R&B
-    'happy_sunny_rnb': '37i9dQZF1DX4SBhb3fqCJd',
-    'happy_rain_rnb': '37i9dQZF1DWYmmr74INQlb',
-    'happy_cold_rnb': '37i9dQZF1DX6VDO8a6cQME',
-    'chill_sunny_rnb': '37i9dQZF1DWXnexX7CktaI',
-    'chill_rain_rnb': '37i9dQZF1DWTwzVdyRpXNF',
-    'chill_cold_rnb': '37i9dQZF1DX1rVvRgjBkUE',
-    'sad_sunny_rnb': '37i9dQZF1DX4SBhb3fqCJd',
-    'sad_rain_rnb': '37i9dQZF1DX3YSRoSdA634',
-    'sad_cold_rnb': '37i9dQZF1DWW293M8GSBpq',
-    'energetic_sunny_rnb': '37i9dQZF1DWYmmr74INQlb',
-    'energetic_rain_rnb': '37i9dQZF1DX4y8h9WqDPAE',
-    'energetic_cold_rnb': '37i9dQZF1DX5OepaGriAIm',
+    // RNB
+    'happy_rnb': 'r&b hits',
+    'chill_rnb': 'alternative r&b',
+    'sad_rnb': 'soul',
+    'energetic_rnb': 'funk',
 
-    // COMBINAZIONI MULTIPLE (esempi)
-    'chill_rain_lofi_jazz': '37i9dQZF1DXa1rZf8gLhyz',
-    'happy_sunny_pop_rock': '37i9dQZF1DXcBWIGoYBM5M',
-    'sad_rain_indie_rock': '37i9dQZF1DWVpCVxPAhVYW',
-    'energetic_sunny_electronic_pop': '37i9dQZF1DX4dyzvuaRJ0n',
+    // METAL
+    'happy_metal': 'glam metal',
+    'chill_metal': 'stoner rock',
+    'sad_metal': 'doom metal',
+    'energetic_metal': 'heavy metal',
 
-    // FALLBACK
-    'fallback': '37i9dQZF1DX4WYpdgoIcn6'
+    // CLASSICAL
+    'happy_classical': 'baroque',
+    'chill_classical': 'piano',
+    'sad_classical': 'adagio',
+    'energetic_classical': 'symphony'
+
 };
 
-// FUNZIONE: Ottieni generi selezionati
+// FUNZIONE: Ottieni generi e ordina alfabeticamente
 function getSelectedGenres() {
     const checkboxes = document.querySelectorAll('input[name="genre"]:checked');
     return Array.from(checkboxes).map(cb => cb.value).sort();
 }
 
-// FUNZIONE: Aggiorna display generi
+//FUNZIONE: Aggiorna display generi
 function updateGenreDisplay() {
     const genres = getSelectedGenres();
     const display = document.getElementById('selectedGenres');
     
-    if (genres.length === 0) {
+    if (genres.length == 0) {
         display.innerText = 'Nessun genere selezionato (playlist generiche)';
     } else {
         display.innerText = 'Generi selezionati: ' + genres.join(', ');
     }
 }
 
-// FUNZIONE: Applica toggle meteo
+//FUNZIONE: Applica scelta meteo
 function applyWeatherToggle() {
     const meteoSection = document.getElementById('meteoSection');
     const meteoTitle = document.getElementById('meteoTitle');
@@ -168,16 +252,16 @@ function applyWeatherToggle() {
     const playerTitle = document.getElementById('playerTitle');
     
     if (useWeather) {
-        meteoSection.style.display = '';
+        meteoSection.style.display = 'block';
         meteoTitle.innerText = '1. Meteo';
-        genresTitle.innerText = '2. Generi Musicali';
+        genresTitle.innerText = '2. Generi Musicali (Opzionale)';
         moodTitle.innerText = '3. Scegli Mood';
-        playerTitle.innerText = '4. Player';
+        playerTitle.innerText = '4. Risultati';
     } else {
         meteoSection.style.display = 'none';
-        genresTitle.innerText = '1. Generi Musicali';
+        genresTitle.innerText = '1. Generi Musicali (Opzionale)';
         moodTitle.innerText = '2. Scegli Mood';
-        playerTitle.innerText = '3. Player';
+        playerTitle.innerText = '3. Risultati';
         currentVibe = 'sunny';
         meteo = false;
     }
@@ -230,68 +314,123 @@ function updateState(vibe, temp, desc, city) {
     meteo = true;
 }
 
-// FUNZIONE MOOD + GENERI
-function setMood(mood) {
-    const genres = getSelectedGenres();
+//FUNZIONE: Selezione mood e ricerca meteo
+async function setMood(mood) {
+    const outputText = document.getElementById('resultText');
+    const list = document.getElementById('trackList');
+    const selectedGenres = getSelectedGenres();
     
-    // Costruisci chiave dinamica
-    let key;
-    if (genres.length === 0) {
-        key = `${mood}_${currentVibe}`;
-    } else {
-        key = `${mood}_${currentVibe}_${genres.join('_')}`;
-    }
-    
-    console.log('Chiave:', key);
-    
-    // Cerca playlist
-    let playlistId = playlists[key];
-    
-    // Fallback: prova solo primo genere
-    if (!playlistId && genres.length > 0) {
-        const fallbackKey = `${mood}_${currentVibe}_${genres[0]}`;
-        playlistId = playlists[fallbackKey];
-    }
-    
-    // Fallback: solo mood + meteo
-    if (!playlistId) {
-        playlistId = playlists[`${mood}_${currentVibe}`];
-    }
-    
-    // Fallback finale
-    if (!playlistId) {
-        playlistId = playlists['fallback'];
-    }
+    list.innerHTML = '<li>Caricamento...</li>';
 
-    // Aggiorna player
-    document.getElementById('spotifyPlayer').src = 
-        `https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator`;
-    
-    // Mostra risultato
-    const meteoLabel = useWeather ? (currentVibe.toUpperCase() || 'DEFAULT') : 'OMESSO';
-    let result = `Mood: ${mood.toUpperCase()} | Meteo: ${meteoLabel}`;
-    if (genres.length > 0) {
-        result += ` | Generi: ${genres.join(', ')}`;
+    try {
+        let allTracks = [];
+        let description = "";
+        let tagsUsed = [];
+
+        // SELEZIONE MULTIPLA GENERI (1 a N)
+        if (selectedGenres.length > 0) {
+            
+            // Creiamo una lista di richieste (una per ogni genere)
+            const requests = selectedGenres.map(genre => {
+                const key = useWeather ? `${mood}_${currentVibe}_${genre}` : `${mood}_${genre}`;
+                
+                // Fallback intelligente: se la chiave non esiste, usa "mood genre"
+                const tag = musicTags[key] || `${mood} ${genre}`;
+                tagsUsed.push(tag);
+                
+                const url = `https://ws.audioscrobbler.com/2.0/?method=tag.gettoptracks&tag=${encodeURIComponent(tag)}&api_key=d1210cd099e3597cc3d4e74ffc303388&format=json&limit=50`;
+                return fetch(url).then(res => res.json());
+            });
+
+            // Aspettiamo che TUTTE le richieste finiscano
+            const results = await Promise.all(requests);
+            
+            // Uniamo tutte le tracce trovate
+            results.forEach(data => {
+                if (data.tracks && data.tracks.track) {
+                    const tracks = Array.isArray(data.tracks.track) ? data.tracks.track : [data.tracks.track];
+                    allTracks = [...allTracks, ...tracks];
+                }
+            });
+            
+            const meteoInfo = useWeather ? `(Meteo: ${currentVibe})` : '(No Meteo)';
+            description = tagsUsed.join(' + ');
+            outputText.innerText = `Mix Multigenere: "${description.toUpperCase()}" ${meteoInfo}...`;
+
+        } else {
+            // NESSUN GENERE SELEZIONATO (Base Mood)
+            const key = useWeather ? `${mood}_${currentVibe}` : `${mood}`;
+            const tag = musicTags[key] || mood;
+            
+            const meteoInfo = useWeather ? `(Meteo: ${currentVibe})` : '(No Meteo)';
+            outputText.innerText = `Tag: "${tag.toUpperCase()}" ${meteoInfo}...`;
+            
+            const url = `https://ws.audioscrobbler.com/2.0/?method=tag.gettoptracks&tag=${encodeURIComponent(tag)}&api_key=d1210cd099e3597cc3d4e74ffc303388&format=json&limit=100`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.tracks && data.tracks.track) {
+                 allTracks = Array.isArray(data.tracks.track) ? data.tracks.track : [data.tracks.track];
+            }
+            description = tag;
+        }
+
+        // Processa e mostra le tracce
+        processTracks(allTracks, list, outputText, description);
+
+    } catch (error) {
+        console.error(error);
+        list.innerHTML = `<li>Errore nel caricamento: ${error.message}</li>`;
     }
-    document.getElementById('resultText').innerText = result;
 }
 
-// ============================================
-// INIZIALIZZAZIONE - Event Listeners
-// ============================================
+function processTracks(allTracks, listElement, textElement, tagName) {
+    if (!allTracks || allTracks.length === 0) {
+        listElement.innerHTML = '<li>Nessuna traccia trovata.</li>';
+        return;
+    }
+
+    // --- RANDOMIZZAZIONE ---
+    for (let i = allTracks.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allTracks[i], allTracks[j]] = [allTracks[j], allTracks[i]];
+    }
+
+    // Prendiamo solo le prime 10
+    const selectedTracks = allTracks.slice(0, 10);
+
+    listElement.innerHTML = ''; // Pulisci
+    
+    selectedTracks.forEach(track => {
+        const li = document.createElement('li');
+        const query = encodeURIComponent(`${track.artist.name} ${track.name}`);
+        const youtubeUrl = `https://www.youtube.com/results?search_query=${query}`;
+        
+        li.innerHTML = `
+            <strong>${track.name}</strong> - ${track.artist.name} 
+            <small>(<a href="${youtubeUrl}" target="_blank" style="color: #d32f2f; text-decoration: none;">▶ Ascolta su YT</a>)</small>
+        `;
+        listElement.appendChild(li);
+    });
+    
+    textElement.innerText = `Ecco 10 tracce casuali per "${tagName.toUpperCase()}":`;
+}
+
+
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Leggi localStorage
     const saved = localStorage.getItem('mm_useWeather');
-    useWeather = (saved !== 'no');
+    if (saved !== null) {
+        useWeather = (saved === 'yes');
+    }
     
     // Sincronizza radio
     const radioYes = document.querySelector('input[name="useWeather"][value="yes"]');
     const radioNo = document.querySelector('input[name="useWeather"][value="no"]');
     if (useWeather) {
-        radioYes.checked = true;
+        if(radioYes) radioYes.checked = true;
     } else {
-        radioNo.checked = true;
+        if(radioNo) radioNo.checked = true;
     }
     
     // Applica stato iniziale
@@ -307,11 +446,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Bottone Meteo
-    document.getElementById('btnMeteo').addEventListener('click', getRealWeather);
+    const btnMeteo = document.getElementById('btnMeteo');
+    if(btnMeteo) btnMeteo.addEventListener('click', getRealWeather);
     
-    // Checkbox generi
+    // Checkbox generi (MAX 2 SELEZIONI)
     document.querySelectorAll('input[name="genre"]').forEach(checkbox => {
-        checkbox.addEventListener('change', updateGenreDisplay);
+        checkbox.addEventListener('change', function() {
+            updateGenreDisplay();
+        });
     });
     
     // Bottoni Mood
@@ -323,9 +465,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Enter su input città
-    document.getElementById('cityInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            getRealWeather();
-        }
-    });
+    const cityIn = document.getElementById('cityInput');
+    if(cityIn) {
+        cityIn.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                getRealWeather();
+            }
+        });
+    }
 });
