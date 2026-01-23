@@ -1,0 +1,320 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    color: #1f2937; /* slate-800 */
+    transition: background-color 1s ease, color 1s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#bgVideo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -30;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+#moodOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -20;
+    background: linear-gradient(to bottom right, #e0e7ff, #f3e8ff); 
+    opacity: 0.9;
+    transition: background 1s ease, opacity 1s ease;
+}
+
+
+.glass-container {
+    width: 100%;
+    max-width: 700px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 10;
+    transition: background 0.5s ease, color 0.5s ease;
+}
+
+
+body.dark-mode .glass-container {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+}
+
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0 0 10px 0;
+    background: linear-gradient(to right, #7c3aed, #db2777, #2563eb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -1px;
+}
+
+p.subtitle {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+    opacity: 0.6;
+    margin: 0;
+}
+
+h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0.9;
+}
+
+.icon-box {
+    display: inline-flex;
+    padding: 6px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+}
+
+
+.section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: 16px;
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
+    font-family: inherit;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s;
+}
+
+input[type="text"]:focus {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary {
+    padding: 14px 24px;
+    border-radius: 16px;
+    border: none;
+    background: linear-gradient(to right, #6366f1, #a855f7);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+}
+
+
+.radio-group {
+    display: flex;
+    gap: 10px;
+    background: rgba(0,0,0,0.05);
+    padding: 5px;
+    border-radius: 10px;
+    display: inline-flex;
+}
+
+.radio-label {
+    padding: 5px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.radio-label input {
+    display: none;
+}
+
+.radio-label:has(input:checked) {
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    color: #4f46e5;
+}
+
+
+.chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip-label {
+    cursor: pointer;
+}
+
+.chip-label input {
+    display: none;
+}
+
+.chip-text {
+    display: block;
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.4);
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.chip-label input:checked + .chip-text {
+    background: #8b5cf6;
+    color: white;
+    border-color: #8b5cf6;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+
+.mood-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+@media (max-width: 600px) {
+    .mood-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.mood-btn {
+    border: none;
+    background: rgba(255,255,255,0.4);
+    padding: 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.mood-btn:hover {
+    transform: translateY(-5px);
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.mood-emoji {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 5px;
+    transition: transform 0.3s;
+}
+
+.mood-btn:hover .mood-emoji {
+    transform: scale(1.2);
+}
+
+.mood-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: inherit;
+}
+
+
+.track-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.track-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 12px 16px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.track-item:hover {
+    background: rgba(255,255,255,0.6);
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.track-info h4 {
+    margin: 0 0 2px 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.track-info span {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.track-genre {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 6px;
+    text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.6;
+}
+
+.hidden { display: none; }
