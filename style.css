@@ -317,4 +317,146 @@ input[type="text"]:focus {
     opacity: 0.6;
 }
 
+/* ============================================================
+   NUOVA FEATURE: Stili per il controllo numero tracce
+   ============================================================ */
+
+.track-count-control {
+    margin-top: 20px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.track-count-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.track-count-header label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.track-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 32px;
+    padding: 0 12px;
+    background: linear-gradient(to right, #6366f1, #a855f7);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.track-count-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, 
+        rgba(99, 102, 241, 0.2), 
+        rgba(168, 85, 247, 0.2)
+    );
+    outline: none;
+    transition: all 0.3s;
+}
+
+.track-count-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(to right, #6366f1, #a855f7);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.track-count-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+}
+
+.track-count-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(to right, #6366f1, #a855f7);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.track-count-slider::-moz-range-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+}
+
+.track-count-range {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    opacity: 0.5;
+    font-weight: 600;
+}
+
+/* Dark mode support per il controllo tracce */
+body.dark-mode .track-count-control {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .track-count-slider {
+    background: linear-gradient(to right, 
+        rgba(99, 102, 241, 0.3), 
+        rgba(168, 85, 247, 0.3)
+    );
+}
+
+/* ============================================================
+   NUOVA FEATURE: Bottone play per YouTube
+   ============================================================ */
+
+.track-play-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(to right, #ef4444, #dc2626);
+    color: white;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.track-play-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+body.dark-mode .track-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .track-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
 .hidden { display: none; }
