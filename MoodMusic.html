@@ -23,7 +23,6 @@
         <div class="section">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>
-                    <!-- <span class="icon-box" style="background:#e0f2fe; color:#0284c7">⚙️</span> -->
                     Preferenze
                 </h3>
                 <div class="radio-group">
@@ -37,11 +36,31 @@
                     </label>
                 </div>
             </div>
+            
+            <!-- NUOVA FEATURE: Controllo numero tracce playlist -->
+            <div class="track-count-control">
+                <div class="track-count-header">
+                    <label for="trackCountSlider">Numero tracce playlist:</label>
+                    <span id="trackCountValue" class="track-count-badge">10</span>
+                </div>
+                <input 
+                    type="range" 
+                    id="trackCountSlider" 
+                    min="5" 
+                    max="30" 
+                    value="10" 
+                    class="track-count-slider"
+                >
+                <div class="track-count-range">
+                    <span>5</span>
+                    <span>30</span>
+                </div>
+            </div>
+            <!-- FINE NUOVA FEATURE -->
         </div>
 
         <div id="meteoSection" class="section">
             <h3>
-                <!-- <span class="icon-box" style="background:#dbeafe; color:#2563eb">🌦️</span> -->
                 Che tempo fa?
             </h3>
             <div class="input-group">
@@ -53,7 +72,6 @@
 
         <div class="section">
             <h3>
-                <!-- <span class="icon-box" style="background:#f3e8ff; color:#9333ea">🎧</span> -->
                 Filtri Musicali
             </h3>
             <div class="chips-container">
@@ -69,7 +87,6 @@
 
         <div class="section">
             <h3>
-                <!-- <span class="icon-box" style="background:#fce7f3; color:#db2777">🎭</span> -->
                 Come ti senti?
             </h3>
             <div class="mood-grid">
@@ -105,221 +122,7 @@
 
     </div>
 
-    <script>
-    
-
-        const state = {
-            weatherUsed: true,
-            currentWeather: null, 
-            lastFetchedWeather: null,
-            currentMood: null,
-            selectedGenres: [],
-            city: ''
-        };
-
-        const els = {
-            radioWeather: document.querySelectorAll('input[name="useWeather"]'),
-            meteoSection: document.getElementById('meteoSection'),
-            cityInput: document.getElementById('cityInput'),
-            btnMeteo: document.getElementById('btnMeteo'),
-            weatherOutput: document.getElementById('weatherOutput'),
-            genreInputs: document.querySelectorAll('input[name="genre"]'),
-            selectedGenresTxt: document.getElementById('selectedGenres'),
-            moodBtns: document.querySelectorAll('.mood-btn'),
-            resultText: document.getElementById('resultText'),
-            trackList: document.getElementById('trackList'),
-            body: document.body,
-            mainContainer: document.getElementById('mainContainer'),
-            bgVideo: document.getElementById('bgVideo'),
-            moodOverlay: document.getElementById('moodOverlay')
-        };
-
-        const videoAssets = {
-            'Rain': 'https://assets.mixkit.co/videos/preview/mixkit-rain-falling-on-the-window-sill-1626-large.mp4',
-            'Clouds': 'https://assets.mixkit.co/videos/preview/mixkit-clouds-moving-in-the-sky-2502-large.mp4',
-            'Clear': 'https://assets.mixkit.co/videos/preview/mixkit-sun-rays-through-the-trees-1188-large.mp4',
-            'Storm': 'https://assets.mixkit.co/videos/preview/mixkit-lightning-in-the-dark-sky-2358-large.mp4'
-        };
-
-        els.radioWeather.forEach(r => {
-            r.addEventListener('change', (e) => {
-                state.weatherUsed = e.target.value === 'yes';
-                if(state.weatherUsed) {
-                    els.meteoSection.style.opacity = '1';
-                    els.meteoSection.style.pointerEvents = 'auto';
-                    if (state.lastFetchedWeather) {
-                        state.currentWeather = state.lastFetchedWeather;
-                        updateTheme();
-                    }
-                } else {
-                    els.meteoSection.style.opacity = '0.5';
-                    els.meteoSection.style.pointerEvents = 'none';
-                    state.currentWeather = null;
-                    updateTheme(); 
-                }
-            });
-        });
-
-        els.btnMeteo.addEventListener('click', () => {
-            const city = els.cityInput.value.trim();
-            if (!city) return alert("Inserisci una città!");
-
-            state.city = city;
-            els.weatherOutput.innerHTML = "🔄 Controllo le nuvole...";
-            els.weatherOutput.classList.remove('hidden');
-
-            setTimeout(() => {
-                const weathers = ['Clear', 'Clouds', 'Rain', 'Storm'];
-                const temps = [15, 22, 28, 10, 5];
-                
-                const randomWeather = weathers[Math.floor(Math.random() * weathers.length)];
-                const randomTemp = temps[Math.floor(Math.random() * temps.length)];
-
-                state.currentWeather = randomWeather;
-                state.lastFetchedWeather = randomWeather;
-                
-                let icon = '';
-                if(randomWeather === 'Clear') icon = '☀️';
-                if(randomWeather === 'Clouds') icon = '☁️';
-                if(randomWeather === 'Rain') icon = '🌧️';
-                if(randomWeather === 'Storm') icon = '⚡';
-
-                els.weatherOutput.innerHTML = `${icon} A <b>${city}</b> ci sono ${randomTemp}°C (${randomWeather})`;
-                updateTheme();
-            }, 800);
-        });
-
-    
-        els.genreInputs.forEach(input => {
-            input.addEventListener('change', () => {
-                const checked = Array.from(els.genreInputs).filter(i => i.checked).map(i => i.value);
-                state.selectedGenres = checked;
-                els.selectedGenresTxt.textContent = checked.length > 0 
-                    ? `Selezionati: ${checked.join(', ')}` 
-                    : "Nessun genere selezionato (playlist generiche)";
-            });
-        });
-
-        
-        els.moodBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                state.currentMood = btn.getAttribute('data-mood');
-                updateTheme();
-                generatePlaylist();
-            });
-        });
-
-        function updateTheme() {
-            const mood = state.currentMood;
-            const weather = state.currentWeather;
-            let overlayColor = "linear-gradient(to bottom right, #e0e7ff, #f3e8ff)";
-            let isDarkMode = false;
-            let videoUrl = "";
-
-        
-            if (state.weatherUsed && weather && videoAssets[weather]) {
-                videoUrl = videoAssets[weather];
-                if (!els.bgVideo.src.includes(videoUrl)) {
-                    els.bgVideo.src = videoUrl;
-                    els.bgVideo.style.opacity = '0';
-                    setTimeout(() => els.bgVideo.style.opacity = '1', 100);
-                } else {
-                    els.bgVideo.style.opacity = '1';
-                }
-            } else {
-                els.bgVideo.style.opacity = '0';
-                setTimeout(() => els.bgVideo.src = "", 1000); 
-            }
-
-    
-            if (mood === 'happy') {
-                overlayColor = "linear-gradient(to bottom right, rgba(253, 224, 71, 0.7), rgba(244, 114, 182, 0.7))"; // giallo/ rosa
-                if(weather === 'Clear') overlayColor = "linear-gradient(to bottom right, rgba(253, 224, 71, 0.3), rgba(34, 211, 238, 0.3))"; // sunny
-            } 
-            else if (mood === 'sad') {
-                overlayColor = "linear-gradient(to bottom right, rgba(148, 163, 184, 0.8), rgba(71, 85, 105, 0.8))"; // grigio/blu
-                if (weather === 'Rain' || weather === 'Storm') {
-                    overlayColor = "linear-gradient(to bottom right, rgba(15, 23, 42, 0.85), rgba(0, 0, 0, 0.85))";
-                    isDarkMode = true;
-                }
-            } 
-            else if (mood === 'chill') {
-                overlayColor = "linear-gradient(to bottom right, rgba(167, 243, 208, 0.7), rgba(52, 211, 153, 0.7))"; // verde
-                if(weather === 'Rain') {
-                     overlayColor = "linear-gradient(to bottom right, rgba(20, 83, 45, 0.7), rgba(8, 51, 68, 0.7))"; // verde scuro
-                     isDarkMode = true;
-                }
-            } 
-            else if (mood === 'energetic') {
-                overlayColor = "linear-gradient(to bottom right, rgba(251, 113, 133, 0.7), rgba(249, 115, 22, 0.7))"; // rosso/arancio
-            }
-
-
-            els.moodOverlay.style.background = overlayColor;
-            
-            if(isDarkMode) {
-                els.body.classList.add('dark-mode');
-            } else {
-                els.body.classList.remove('dark-mode');
-            }
-        }
-
-        function generatePlaylist() {
-            const mood = state.currentMood;
-            const genres = state.selectedGenres;
-            const weather = state.currentWeather;
-
-            let contextText = `Playlist per mood <b>${mood.toUpperCase()}</b>`;
-            if (state.weatherUsed && weather) contextText += ` con meteo <b>${weather.toUpperCase()}</b>`;
-            els.resultText.innerHTML = contextText;
-
-            const mockSongs = getMockSongs(mood, genres);
-            els.trackList.innerHTML = '';
-            
-            mockSongs.forEach((song, index) => {
-                const li = document.createElement('li');
-                li.className = "track-item";
-                li.innerHTML = `
-                    <div class="track-info">
-                        <h4>${song.title}</h4>
-                        <span>${song.artist}</span>
-                    </div>
-                    <span class="track-genre">${song.genre}</span>
-                `;
-                els.trackList.appendChild(li);
-            });
-        }
-
-        function getMockSongs(mood, genresFilter) {
-            const db = [
-                { m: 'happy', g: 'pop', title: "Happy", artist: "Pharrell Williams" },
-                { m: 'happy', g: 'pop', title: "Can't Stop the Feeling!", artist: "Justin Timberlake" },
-                { m: 'happy', g: 'rock', title: "Mr. Brightside", artist: "The Killers" },
-                { m: 'happy', g: 'electronic', title: "Get Lucky", artist: "Daft Punk" },
-                { m: 'sad', g: 'pop', title: "Someone Like You", artist: "Adele" },
-                { m: 'sad', g: 'rock', title: "Creep", artist: "Radiohead" },
-                { m: 'sad', g: 'lofi', title: "Rainy Night", artist: "Lofi Girl" },
-                { m: 'sad', g: 'classical', title: "Moonlight Sonata", artist: "Beethoven" },
-                { m: 'chill', g: 'lofi', title: "Study Beats", artist: "ChilledCow" },
-                { m: 'chill', g: 'electronic', title: "Sunset Lover", artist: "Petit Biscuit" },
-                { m: 'chill', g: 'rnb', title: "Best Part", artist: "Daniel Caesar" },
-                { m: 'energetic', g: 'rock', title: "Eye of the Tiger", artist: "Survivor" },
-                { m: 'energetic', g: 'rap', title: "Lose Yourself", artist: "Eminem" },
-                { m: 'energetic', g: 'metal', title: "Enter Sandman", artist: "Metallica" }
-            ];
-
-            let filtered = db.filter(s => s.m === mood);
-            if (genresFilter && genresFilter.length > 0) {
-                const genreMatch = filtered.filter(s => genresFilter.includes(s.g));
-                if (genreMatch.length > 0) filtered = genreMatch;
-            }
-
-
-            while(filtered.length < 3) {
-                filtered.push({ m: mood, g: 'Mix', title: `Random ${mood} Track`, artist: "Various Artists" });
-            }
-            return filtered;
-        }
-    </script>
+    <!-- JavaScript separato -->
+    <script src="script.js"></script>
 </body>
 </html>
