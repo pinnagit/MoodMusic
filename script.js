@@ -1,7 +1,49 @@
-let currentVibe = 'sunny';
-let meteo = false;
-let useWeather = true;
+// ============================================================
+// MOODMUSIC - Script principale
+// ============================================================
 
+// ============================================================
+// STATO DELL'APPLICAZIONE
+// MODIFICATO: Aggiunto trackCount per gestire il numero di tracce
+// ============================================================
+const state = {
+    weatherUsed: true,
+    currentWeather: null, 
+    lastFetchedWeather: null,
+    currentMood: null,
+    selectedGenres: [],
+    city: '',
+    currentVibe: 'sunny',
+    trackCount: 10  // NUOVO: Numero di tracce della playlist (default 10)
+};
+
+// ============================================================
+// ELEMENTI DOM
+// MODIFICATO: Aggiunti riferimenti per il controllo numero tracce
+// ============================================================
+const els = {
+    radioWeather: document.querySelectorAll('input[name="useWeather"]'),
+    meteoSection: document.getElementById('meteoSection'),
+    cityInput: document.getElementById('cityInput'),
+    btnMeteo: document.getElementById('btnMeteo'),
+    weatherOutput: document.getElementById('weatherOutput'),
+    genreInputs: document.querySelectorAll('input[name="genre"]'),
+    selectedGenresTxt: document.getElementById('selectedGenres'),
+    moodBtns: document.querySelectorAll('.mood-btn'),
+    resultText: document.getElementById('resultText'),
+    trackList: document.getElementById('trackList'),
+    body: document.body,
+    mainContainer: document.getElementById('mainContainer'),
+    bgVideo: document.getElementById('bgVideo'),
+    moodOverlay: document.getElementById('moodOverlay'),
+    // NUOVO: Elementi per il controllo numero tracce
+    trackCountSlider: document.getElementById('trackCountSlider'),
+    trackCountValue: document.getElementById('trackCountValue')
+};
+
+// ============================================================
+// MUSIC TAGS - Mappatura mood/meteo/genere -> tag Last.fm
+// ============================================================
 const musicTags = {
     // --- BASE (SENZA GENERE SPECIFICO) ---
     'happy_sunny': 'summer hits',
@@ -222,64 +264,66 @@ const musicTags = {
     'chill_classical': 'piano',
     'sad_classical': 'adagio',
     'energetic_classical': 'symphony'
-
 };
 
-// FUNZIONE: Ottieni generi e ordina alfabeticamente
-function getSelectedGenres() {
-    const checkboxes = document.querySelectorAll('input[name="genre"]:checked');
-    return Array.from(checkboxes).map(cb => cb.value).sort();
-}
+// ============================================================
+// VIDEO ASSETS - Video di sfondo per condizioni meteo
+// ============================================================
+const videoAssets = {
+    'Rain': 'https://assets.mixkit.co/videos/preview/mixkit-rain-falling-on-the-window-sill-1626-large.mp4',
+    'Clouds': 'https://assets.mixkit.co/videos/preview/mixkit-clouds-moving-in-the-sky-2502-large.mp4',
+    'Clear': 'https://assets.mixkit.co/videos/preview/mixkit-sun-rays-through-the-trees-1188-large.mp4',
+    'Storm': 'https://assets.mixkit.co/videos/preview/mixkit-lightning-in-the-dark-sky-2358-large.mp4'
+};
 
-//FUNZIONE: Aggiorna display generi
-function updateGenreDisplay() {
-    const genres = getSelectedGenres();
-    const display = document.getElementById('selectedGenres');
+// ============================================================
+// NUOVA FEATURE: Event listener per slider numero tracce
+// Aggiorna lo stato e il display quando l'utente modifica il valore
+// ============================================================
+els.trackCountSlider.addEventListener('input', (e) => {
+    const value = parseInt(e.target.value);
+    state.trackCount = value;
+    els.trackCountValue.textContent = value;
     
-    if (genres.length == 0) {
-        display.innerText = 'Nessun genere selezionato (playlist generiche)';
-    } else {
-        display.innerText = 'Generi selezionati: ' + genres.join(', ');
-    }
-}
+    // Salva in localStorage per persistenza
+    localStorage.setItem('mm_trackCount', value);
+});
 
-//FUNZIONE: Applica scelta meteo
-function applyWeatherToggle() {
-    const meteoSection = document.getElementById('meteoSection');
-    const meteoTitle = document.getElementById('meteoTitle');
-    const genresTitle = document.getElementById('genresTitle');
-    const moodTitle = document.getElementById('moodTitle');
-    const playerTitle = document.getElementById('playerTitle');
-    
-    if (useWeather) {
-        meteoSection.style.display = 'block';
-        meteoTitle.innerText = '1. Meteo';
-        genresTitle.innerText = '2. Generi Musicali (Opzionale)';
-        moodTitle.innerText = '3. Scegli Mood';
-        playerTitle.innerText = '4. Risultati';
-    } else {
-        meteoSection.style.display = 'none';
-        genresTitle.innerText = '1. Generi Musicali (Opzionale)';
-        moodTitle.innerText = '2. Scegli Mood';
-        playerTitle.innerText = '3. Risultati';
-        currentVibe = 'sunny';
-        meteo = false;
-    }
-}
+// ============================================================
+// EVENT LISTENERS - Radio Meteo
+// ============================================================
+els.radioWeather.forEach(r => {
+    r.addEventListener('change', (e) => {
+        state.weatherUsed = e.target.value === 'yes';
+        localStorage.setItem('mm_useWeather', state.weatherUsed ? 'yes' : 'no');
+        
+        if(state.weatherUsed) {
+            els.meteoSection.style.opacity = '1';
+            els.meteoSection.style.pointerEvents = 'auto';
+            if (state.lastFetchedWeather) {
+                state.currentWeather = state.lastFetchedWeather;
+                updateTheme();
+            }
+        } else {
+            els.meteoSection.style.opacity = '0.5';
+            els.meteoSection.style.pointerEvents = 'none';
+            state.currentWeather = null;
+            state.currentVibe = 'sunny';
+            updateTheme(); 
+        }
+    });
+});
 
-// FUNZIONE METEO
-async function getRealWeather() {
-    if (!useWeather) return;
-    
-    const city = document.getElementById('cityInput').value.trim();
-    const output = document.getElementById('weatherOutput');
+// ============================================================
+// EVENT LISTENERS - Bottone Meteo (API reale OpenWeatherMap)
+// ============================================================
+els.btnMeteo.addEventListener('click', async () => {
+    const city = els.cityInput.value.trim();
+    if (!city) return alert("Inserisci una città!");
 
-    if (!city) {
-        alert("Inserisci una città!");
-        return;
-    }
-
-    output.innerText = "Caricamento...";
+    state.city = city;
+    els.weatherOutput.innerHTML = "🔄 Controllo le nuvole...";
+    els.weatherOutput.classList.remove('hidden');
 
     try {
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=d7cf6e05bb02b3e99058f0c599353815&units=metric&lang=it`;
@@ -293,184 +337,266 @@ async function getRealWeather() {
         const description = data.weather[0].description;
         
         let vibe = 'sunny';
+        let weather = 'Clear';
+        
         if (temp < 5) {
             vibe = 'cold';
+            weather = 'Clouds';
         } else if (conditionId < 700) {
             vibe = 'rain';
+            if (conditionId < 300) {
+                weather = 'Storm';
+            } else {
+                weather = 'Rain';
+            }
         }
         
-        updateState(vibe, temp, description, city);
+        state.currentVibe = vibe;
+        state.currentWeather = weather;
+        state.lastFetchedWeather = weather;
+        
+        let icon = '';
+        if(weather === 'Clear') icon = '☀️';
+        if(weather === 'Clouds') icon = '☁️';
+        if(weather === 'Rain') icon = '🌧️';
+        if(weather === 'Storm') icon = '⚡';
+
+        els.weatherOutput.innerHTML = `${icon} A <b>${city}</b> ci sono ${temp.toFixed(1)}°C (${description})`;
+        updateTheme();
 
     } catch (error) {
-        output.innerText = "Errore: " + error.message;
+        els.weatherOutput.innerHTML = "❌ Errore: " + error.message;
+    }
+});
+
+// Enter su input città
+els.cityInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        els.btnMeteo.click();
+    }
+});
+
+// ============================================================
+// EVENT LISTENERS - Generi
+// ============================================================
+els.genreInputs.forEach(input => {
+    input.addEventListener('change', () => {
+        const checked = Array.from(els.genreInputs).filter(i => i.checked).map(i => i.value);
+        state.selectedGenres = checked;
+        els.selectedGenresTxt.textContent = checked.length > 0 
+            ? `Selezionati: ${checked.join(', ')}` 
+            : "Nessun genere selezionato (playlist generiche)";
+    });
+});
+
+// ============================================================
+// EVENT LISTENERS - Mood Buttons
+// ============================================================
+els.moodBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        state.currentMood = btn.getAttribute('data-mood');
+        updateTheme();
+        generatePlaylist();
+    });
+});
+
+// ============================================================
+// FUNZIONE: Aggiorna tema visivo
+// ============================================================
+function updateTheme() {
+    const mood = state.currentMood;
+    const weather = state.currentWeather;
+    let overlayColor = "linear-gradient(to bottom right, #e0e7ff, #f3e8ff)";
+    let isDarkMode = false;
+    let videoUrl = "";
+
+    if (state.weatherUsed && weather && videoAssets[weather]) {
+        videoUrl = videoAssets[weather];
+        if (!els.bgVideo.src.includes(videoUrl)) {
+            els.bgVideo.src = videoUrl;
+            els.bgVideo.style.opacity = '0';
+            setTimeout(() => els.bgVideo.style.opacity = '1', 100);
+        } else {
+            els.bgVideo.style.opacity = '1';
+        }
+    } else {
+        els.bgVideo.style.opacity = '0';
+        setTimeout(() => els.bgVideo.src = "", 1000); 
+    }
+
+    if (mood === 'happy') {
+        overlayColor = "linear-gradient(to bottom right, rgba(253, 224, 71, 0.7), rgba(244, 114, 182, 0.7))";
+        if(weather === 'Clear') overlayColor = "linear-gradient(to bottom right, rgba(253, 224, 71, 0.3), rgba(34, 211, 238, 0.3))";
+    } 
+    else if (mood === 'sad') {
+        overlayColor = "linear-gradient(to bottom right, rgba(148, 163, 184, 0.8), rgba(71, 85, 105, 0.8))";
+        if (weather === 'Rain' || weather === 'Storm') {
+            overlayColor = "linear-gradient(to bottom right, rgba(15, 23, 42, 0.85), rgba(0, 0, 0, 0.85))";
+            isDarkMode = true;
+        }
+    } 
+    else if (mood === 'chill') {
+        overlayColor = "linear-gradient(to bottom right, rgba(167, 243, 208, 0.7), rgba(52, 211, 153, 0.7))";
+        if(weather === 'Rain') {
+             overlayColor = "linear-gradient(to bottom right, rgba(20, 83, 45, 0.7), rgba(8, 51, 68, 0.7))";
+             isDarkMode = true;
+        }
+    } 
+    else if (mood === 'energetic') {
+        overlayColor = "linear-gradient(to bottom right, rgba(251, 113, 133, 0.7), rgba(249, 115, 22, 0.7))";
+    }
+
+    els.moodOverlay.style.background = overlayColor;
+    
+    if(isDarkMode) {
+        els.body.classList.add('dark-mode');
+    } else {
+        els.body.classList.remove('dark-mode');
     }
 }
 
-// FUNZIONE: Aggiorna stato meteo
-function updateState(vibe, temp, desc, city) {
-    currentVibe = vibe;
-    document.getElementById('weatherOutput').innerText = 
-        `${city}: ${temp.toFixed(1)}°C, ${desc} (Vibe: ${currentVibe.toUpperCase()})`;
-    meteo = true;
-}
+// ============================================================
+// FUNZIONE: Genera playlist con chiamate API Last.fm
+// MODIFICATO: Usa state.trackCount per il numero di tracce
+// ============================================================
+async function generatePlaylist() {
+    const mood = state.currentMood;
+    const genres = state.selectedGenres;
+    const weather = state.currentWeather;
+    const vibe = state.currentVibe;
 
-//FUNZIONE: Selezione mood e ricerca meteo
-async function setMood(mood) {
-    const outputText = document.getElementById('resultText');
-    const list = document.getElementById('trackList');
-    const selectedGenres = getSelectedGenres();
-    
-    list.innerHTML = '<li>Caricamento...</li>';
+    els.trackList.innerHTML = '<li style="text-align: center; padding: 20px;">🔄 Caricamento...</li>';
 
     try {
         let allTracks = [];
-        let description = "";
         let tagsUsed = [];
 
-        // SELEZIONE MULTIPLA GENERI (1 a N)
-        if (selectedGenres.length > 0) {
-            
-            // Creiamo una lista di richieste (una per ogni genere)
-            const requests = selectedGenres.map(genre => {
-                const key = useWeather ? `${mood}_${currentVibe}_${genre}` : `${mood}_${genre}`;
-                
-                // Fallback intelligente: se la chiave non esiste, usa "mood genre"
+        // SELEZIONE CON GENERI
+        if (genres.length > 0) {
+            const requests = genres.map(genre => {
+                const key = state.weatherUsed ? `${mood}_${vibe}_${genre}` : `${mood}_${genre}`;
                 const tag = musicTags[key] || `${mood} ${genre}`;
                 tagsUsed.push(tag);
                 
-                const url = `https://ws.audioscrobbler.com/2.0/?method=tag.gettoptracks&tag=${encodeURIComponent(tag)}&api_key=d1210cd099e3597cc3d4e74ffc303388&format=json&limit=50`;
+                // MODIFICATO: Richiede più tracce per avere margine di randomizzazione
+                const limit = Math.max(50, state.trackCount * 3);
+                const url = `https://ws.audioscrobbler.com/2.0/?method=tag.gettoptracks&tag=${encodeURIComponent(tag)}&api_key=d1210cd099e3597cc3d4e74ffc303388&format=json&limit=${limit}`;
                 return fetch(url).then(res => res.json());
             });
 
-            // Aspettiamo che TUTTE le richieste finiscano
             const results = await Promise.all(requests);
             
-            // Uniamo tutte le tracce trovate
             results.forEach(data => {
                 if (data.tracks && data.tracks.track) {
                     const tracks = Array.isArray(data.tracks.track) ? data.tracks.track : [data.tracks.track];
                     allTracks = [...allTracks, ...tracks];
                 }
             });
-            
-            const meteoInfo = useWeather ? `(Meteo: ${currentVibe})` : '(No Meteo)';
-            description = tagsUsed.join(' + ');
-            outputText.innerText = `Mix Multigenere: "${description.toUpperCase()}" ${meteoInfo}...`;
-
         } else {
-            // NESSUN GENERE SELEZIONATO (Base Mood)
-            const key = useWeather ? `${mood}_${currentVibe}` : `${mood}`;
+            // NESSUN GENERE SELEZIONATO
+            const key = state.weatherUsed ? `${mood}_${vibe}` : `${mood}`;
             const tag = musicTags[key] || mood;
+            tagsUsed.push(tag);
             
-            const meteoInfo = useWeather ? `(Meteo: ${currentVibe})` : '(No Meteo)';
-            outputText.innerText = `Tag: "${tag.toUpperCase()}" ${meteoInfo}...`;
-            
-            const url = `https://ws.audioscrobbler.com/2.0/?method=tag.gettoptracks&tag=${encodeURIComponent(tag)}&api_key=d1210cd099e3597cc3d4e74ffc303388&format=json&limit=100`;
+            // MODIFICATO: Richiede più tracce per avere margine di randomizzazione
+            const limit = Math.max(100, state.trackCount * 3);
+            const url = `https://ws.audioscrobbler.com/2.0/?method=tag.gettoptracks&tag=${encodeURIComponent(tag)}&api_key=d1210cd099e3597cc3d4e74ffc303388&format=json&limit=${limit}`;
             const response = await fetch(url);
             const data = await response.json();
             
             if (data.tracks && data.tracks.track) {
-                 allTracks = Array.isArray(data.tracks.track) ? data.tracks.track : [data.tracks.track];
+                allTracks = Array.isArray(data.tracks.track) ? data.tracks.track : [data.tracks.track];
             }
-            description = tag;
         }
 
         // Processa e mostra le tracce
-        processTracks(allTracks, list, outputText, description);
+        processTracks(allTracks, tagsUsed.join(' + '));
 
     } catch (error) {
         console.error(error);
-        list.innerHTML = `<li>Errore nel caricamento: ${error.message}</li>`;
+        els.trackList.innerHTML = `<li style="text-align: center; color: #ef4444; padding: 20px;">❌ Errore: ${error.message}</li>`;
     }
 }
 
-function processTracks(allTracks, listElement, textElement, tagName) {
+// ============================================================
+// FUNZIONE: Processa e visualizza le tracce
+// MODIFICATO: Usa state.trackCount invece del valore fisso 10
+// MODIFICATO: resultText mostra il numero effettivo di tracce generate
+// ============================================================
+function processTracks(allTracks, tagName) {
     if (!allTracks || allTracks.length === 0) {
-        listElement.innerHTML = '<li>Nessuna traccia trovata.</li>';
+        els.trackList.innerHTML = '<li style="text-align: center; opacity: 0.5; padding: 20px;">Nessuna traccia trovata.</li>';
+        els.resultText.innerHTML = `Nessun risultato per "${tagName}"`;
         return;
     }
 
-    // --- RANDOMIZZAZIONE ---
+    // --- RANDOMIZZAZIONE (Fisher-Yates shuffle) ---
     for (let i = allTracks.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [allTracks[i], allTracks[j]] = [allTracks[j], allTracks[i]];
     }
 
-    // Prendiamo solo le prime 10
-    const selectedTracks = allTracks.slice(0, 10);
+    // MODIFICATO: Usa state.trackCount per determinare quante tracce mostrare
+    const selectedTracks = allTracks.slice(0, state.trackCount);
+    const actualCount = selectedTracks.length;
 
-    listElement.innerHTML = ''; // Pulisci
+    els.trackList.innerHTML = '';
     
-    selectedTracks.forEach(track => {
+    selectedTracks.forEach((track, index) => {
         const li = document.createElement('li');
+        li.className = "track-item";
+        
         const query = encodeURIComponent(`${track.artist.name} ${track.name}`);
         const youtubeUrl = `https://www.youtube.com/results?search_query=${query}`;
         
         li.innerHTML = `
-            <strong>${track.name}</strong> - ${track.artist.name} 
-            <small>(<a href="${youtubeUrl}" target="_blank" style="color: #d32f2f; text-decoration: none;">▶ Ascolta su YT</a>)</small>
+            <div class="track-info">
+                <h4>${track.name}</h4>
+                <span>${track.artist.name}</span>
+            </div>
+            <a href="${youtubeUrl}" target="_blank" class="track-play-btn" title="Cerca su YouTube">
+                ▶
+            </a>
         `;
-        listElement.appendChild(li);
+        els.trackList.appendChild(li);
     });
     
-    textElement.innerText = `Ecco 10 tracce casuali per "${tagName.toUpperCase()}":`;
+    // MODIFICATO: Aggiornato resultText per mostrare il numero di tracce generate
+    let contextText = `🎵 Ecco <b>${actualCount} tracce</b> per "${tagName.toUpperCase()}"`;
+    if (state.weatherUsed && state.currentWeather) {
+        contextText += ` | Meteo: <b>${state.currentVibe.toUpperCase()}</b>`;
+    }
+    els.resultText.innerHTML = contextText;
 }
 
+// ============================================================
+// INIZIALIZZAZIONE - Carica valori salvati
+// MODIFICATO: Aggiunto caricamento del valore trackCount da localStorage
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Carica preferenza meteo
+    const savedWeather = localStorage.getItem('mm_useWeather');
+    if (savedWeather !== null) {
+        state.weatherUsed = (savedWeather === 'yes');
+        const radioYes = document.querySelector('input[name="useWeather"][value="yes"]');
+        const radioNo = document.querySelector('input[name="useWeather"][value="no"]');
+        if (state.weatherUsed) {
+            if(radioYes) radioYes.checked = true;
+        } else {
+            if(radioNo) radioNo.checked = true;
+            els.meteoSection.style.opacity = '0.5';
+            els.meteoSection.style.pointerEvents = 'none';
+        }
+    }
 
-document.addEventListener('DOMContentLoaded', function() {
-    
-    const saved = localStorage.getItem('mm_useWeather');
-    if (saved !== null) {
-        useWeather = (saved === 'yes');
-    }
-    
-    // Sincronizza radio
-    const radioYes = document.querySelector('input[name="useWeather"][value="yes"]');
-    const radioNo = document.querySelector('input[name="useWeather"][value="no"]');
-    if (useWeather) {
-        if(radioYes) radioYes.checked = true;
-    } else {
-        if(radioNo) radioNo.checked = true;
-    }
-    
-    // Applica stato iniziale
-    applyWeatherToggle();
-    
-    // Event listeners radio useWeather
-    document.querySelectorAll('input[name="useWeather"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            useWeather = (this.value === 'yes');
-            localStorage.setItem('mm_useWeather', useWeather ? 'yes' : 'no');
-            applyWeatherToggle();
-        });
-    });
-    
-    // Bottone Meteo
-    const btnMeteo = document.getElementById('btnMeteo');
-    if(btnMeteo) btnMeteo.addEventListener('click', getRealWeather);
-    
-    // Checkbox generi (MAX 2 SELEZIONI)
-    document.querySelectorAll('input[name="genre"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            updateGenreDisplay();
-        });
-    });
-    
-    // Bottoni Mood
-    document.querySelectorAll('.mood-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const mood = this.getAttribute('data-mood');
-            setMood(mood);
-        });
-    });
-    
-    // Enter su input città
-    const cityIn = document.getElementById('cityInput');
-    if(cityIn) {
-        cityIn.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                getRealWeather();
-            }
-        });
+    // NUOVO: Carica preferenza numero tracce
+    const savedTrackCount = localStorage.getItem('mm_trackCount');
+    if (savedTrackCount !== null) {
+        const count = parseInt(savedTrackCount);
+        if (count >= 5 && count <= 30) {
+            state.trackCount = count;
+            els.trackCountSlider.value = count;
+            els.trackCountValue.textContent = count;
+        }
     }
 });
