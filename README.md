@@ -1,250 +1,224 @@
+# 🎵 MoodMusic – Documentazione di Progetto
 
-# Scelta Generi Musicali
+## 1. Descrizione Generale
 
-La funzionalità **Scelta Generi Musicali** permette all’utente di selezionare uno o più generi musicali per personalizzare la playlist generata.  
-La selezione è opzionale: se non viene scelto alcun genere, il sistema utilizza playlist generiche basate unicamente sulla combinazione Mood + Meteo.
+**MoodMusic** è un’applicazione web che consiglia playlist musicali personalizzate combinando **umore dell’utente**, **condizioni meteo in tempo reale** e **generi musicali preferiti**.
+Il sistema raccoglie i dati inseriti dall’utente e, sulla base di tali informazioni, ricerca la playlist più adatta tramite l’API di **Last.fm**.
 
-## Interfaccia Utente
+L’obiettivo del progetto è offrire un’esperienza musicale dinamica e contestuale, in cui musica, emozioni e ambiente si fondono in un’unica interfaccia interattiva.
 
-La sezione è composta da una lista di checkbox all’interno del container `#genreContainer`.  
-Ogni checkbox rappresenta un genere musicale (Pop, Rock, Lofi, Rap, Jazz, Electronic, Indie, R&B).
+---
 
-Le selezioni effettuate vengono mostrate in tempo reale nell’elemento:
-## Raccolta dei generi selezionati
+## 2. Funzionalità Principali
 
-La funzione `getSelectedGenres()`:
+* Selezione dell’umore (Mood)
+* Integrazione opzionale del meteo in tempo reale
+* Scelta dei generi musicali
+* Generazione automatica della playlist
+* Sistema di fallback per garantire sempre un risultato
+* Interfaccia grafica dinamica basata su mood e meteo
 
-- recupera tutti i checkbox `input[name="genre"]:checked`
-- estrae i valori associati
-- ordina i valori alfabeticamente
-- restituisce un array contenente i generi selezionati
+---
 
-Esempio: ["indie", "rock"]
-## Aggiornamento del riepilogo
+## 3. Scelta del Mood
 
-La funzione `updateGenreDisplay()` aggiorna il contenuto di `#selectedGenres`:
+L’utente può selezionare il proprio stato d’animo tra diverse opzioni, ad esempio:
 
-- Nessun genere selezionato → “Nessun genere selezionato (playlist generiche)”
-- Uno o più generi selezionati → “Generi selezionati: ...”
+* Relax
+* Carico
+* Triste
+* Felice
 
-L’aggiornamento avviene automaticamente tramite l’evento `change` su ogni checkbox.
+Il mood rappresenta uno dei parametri fondamentali per la generazione della playlist e influisce anche sull’aspetto grafico dell’applicazione.
 
-## Integrazione con la generazione playlist
+---
 
-Al momento della selezione del mood, i generi vengono integrati nella chiave utilizzata per cercare la playlist più appropriata.
+## 4. Scelta dei Generi Musicali
 
-### Formazione della chiave:
+### 4.1 Descrizione
 
-- Nessun genere selezionato: mood_vibe
-- Uno o più generi selezionati: mood_vibe_genere1_genere2
-  (i generi sono ordinati alfabeticamente)
+La funzionalità **Scelta Generi Musicali** consente all’utente di selezionare uno o più generi per personalizzare la playlist.
 
-Esempio: happy_sunny_indie_rock
-## Sistema di fallback
+La selezione è **opzionale**: se non viene scelto alcun genere, il sistema utilizza playlist generiche basate esclusivamente su Mood + Meteo.
 
-Se la chiave generata non è presente nel database `playlists`, vengono applicati i seguenti fallback:
+### 4.2 Interfaccia Utente
 
-1. Tentativo con la combinazione contenente solo il primo genere selezionato.
-2. In caso di assenza, utilizzo della playlist generica `mood_vibe`.
-3. In ultima istanza, utilizzo della playlist `fallback`.
+* Container: `#genreContainer`
+* Tipologia input: checkbox
+* Generi disponibili:
 
-## Eventi
+  * Pop
+  * Rock
+  * Lofi
+  * Rap
+  * Jazz
+  * Electronic
+  * Indie
+  * R&B
 
-Ogni checkbox appartenente ai generi musicali è collegato alla funzione `updateGenreDisplay()` tramite evento `change`, in modo da mantenere l’interfaccia sempre aggiornata in tempo reale.
+Le selezioni vengono mostrate in tempo reale nell’elemento `#selectedGenres`.
 
-
-# Scelta Meteo (abilita/disabilita + persistenza)
-
-La funzionalità **Scelta Meteo** permette all’utente di decidere se usare oppure omettere il meteo nella generazione della playlist.  
-La scelta è **persistente** tramite `localStorage` e determina sia la **visibilità** della sezione meteo sia la **rinumerazione** delle sezioni successive.
-
-## Interfaccia Utente
-
-- Toggle meteo (radio) all’avvio:
-  - Container: `#weatherToggle`
-  - Opzioni: `input[name="useWeather"][value="yes"|"no"]`
-  - Default: `yes` (se nessun valore salvato)
-
-- Sezione meteo (mostrata/nascosta dinamicamente):
-  - Wrapper: `#meteoSection`
-  - Titolo: `#meteoTitle`
-  - Input città: `#cityInput`
-  - Bottone fetch: `#btnMeteo`
-  - Output stato: `#weatherOutput`
-
-- Titoli sezioni rinumerati:
-  - Generi: `#genresTitle`
-  - Mood: `#moodTitle`
-  - Player: `#playerTitle`
-
-## Stato e Persistenza
-
-- Variabili principali:
-  - `let currentVibe = 'sunny'`
-  - `let meteo = false`
-  - `let useWeather = true`
-
-- Persistenza su `localStorage`:
-  - Chiave: `mm_useWeather`
-  - Valori: `'yes' | 'no'`
-
-- In `DOMContentLoaded`:
-  - Lettura `const saved = localStorage.getItem('mm_useWeather')`
-  - `useWeather = (saved !== 'no')`
-  - Sincronizzazione radio
-  - Chiamata a `applyWeatherToggle()` per allineare UI e numerazione
-
-## Flusso Funzionale
-
-1. **Avvio pagina**
-   - Legge la preferenza da `localStorage`
-   - Sincronizza i radio
-   - Applica lo stato UI (mostra/nasconde meteo, rinumera titoli)
-
-2. **Cambiamento scelta (Sì/No)**
-   - Aggiorna `useWeather`
-   - Salva in `localStorage` (`'yes'`/`'no'`)
-   - Chiama `applyWeatherToggle()` per:
-   - Mostrare/nascondere `#meteoSection`
-   - Rinumerare i titoli
-   - Se `No`: forza `currentVibe = 'sunny'` e `meteo = false`
-
-3. **Richiesta meteo**
-   - `getRealWeather()` esce subito se `useWeather === false`
-   - Altrimenti effettua la fetch, determina la `vibe` (`sunny`/`rain`/`cold`) e chiama `updateState(...)`
-
-4. **Generazione playlist**
-   - `setMood(mood)` compone la chiave con `mood`, `currentVibe` e (eventuali) generi
-   - Etichetta meteo nel risultato:
-   - Se `useWeather === true`: mostra `currentVibe.toUpperCase()`
-   - Se `useWeather === false`: mostra `OMESSO`
-
-## Funzioni Principali
-
-### `applyWeatherToggle()`
-- Se `useWeather === true`:
-  - `#meteoSection` visibile
-  - Titoli: `1. Meteo`, `2. Generi Musicali`, `3. Scegli Mood`, `4. Player`
-- Se `useWeather === false`:
-  - `#meteoSection` nascosto
-  - Titoli rinumerati: `1. Generi Musicali`, `2. Scegli Mood`, `3. Player`
-  - `currentVibe = 'sunny'`, `meteo = false`
-
-### `getRealWeather()`
-- Blocca esecuzione se `useWeather === false`
-- Valida la città (`#cityInput`)
-- Effettua fetch su OpenWeather
-- Determina `vibe`:
-  - `temp < 5` → `cold`
-  - `conditionId < 700` → `rain`
-  - altrimenti → `sunny`
-- Chiama `updateState(vibe, temp, description, city)`
-
-### `updateState(vibe, temp, desc, city)`
-- Aggiorna `currentVibe`
-- Aggiorna `#weatherOutput` con città, temperatura, descrizione e `vibe`
-- Imposta `meteo = true`
-
-### `setMood(mood)`
-- Integra eventuali generi selezionati
-- Costruisce la chiave playlist
-- Applica fallback progressivi (multi-genere → primo genere → `mood_vibe` → `fallback`)
-- Aggiorna `#spotifyPlayer.src`
-- Aggiorna testo risultato:
-- `Meteo: OMESSO` se `useWeather === false`
-- Altrimenti `Meteo: currentVibe.toUpperCase()`
-
-## Eventi
-
-- `DOMContentLoaded`:
-  - Lettura/sincronizzazione `mm_useWeather`
-  - `applyWeatherToggle()`
-  - Binding:
-  - Radio `input[name="useWeather"]` → salva su `localStorage` e `applyWeatherToggle()`
-  - `#btnMeteo` → `getRealWeather()`
-  - Generi (checkbox) → `updateGenreDisplay()`
-  - Bottoni Mood → `setMood(mood)`
-  - `#cityInput` Enter → `getRealWeather()`
-
-## Rinumerazione Dinamica
-
-- Con meteo attivo:
-  - `1. Meteo`, `2. Generi Musicali`, `3. Scegli Mood`, `4. Player`
-- Con meteo omesso:
-  - `1. Generi Musicali`, `2. Scegli Mood`, `3. Player`
-
-## Comportamenti Attesi
-
-- Prima visita: default `useWeather = true` (sezione meteo visibile, numerazione 1..4)
-- Scelgo “No”: sezione meteo nascosta, numerazione aggiornata, `currentVibe = 'sunny'`, `Meteo: OMESSO`
-- Ricarico pagina: la scelta “Sì/No” rimane coerente grazie a `localStorage`
-- Torno a “Sì”: sezione meteo ripristinata, numerazione originale
-
-## Checklist Test
-
-- [ ] Default senza preferenza salvata → meteo visibile, numerazione 1..4
-- [ ] Seleziono “No” → meteo nascosto, numerazione 1..3, `Meteo: OMESSO` nel risultato
-- [ ] Ricarico con “No” salvato → stato persistente correttamente
-- [ ] Torno a “Sì” e ricarico → meteo visibile, numerazione 1..4
-- [ ] `getRealWeather()` non esegue fetch quando `useWeather === false`
-- [ ] `currentVibe` torna `sunny` quando il meteo è omesso
-- [ ] Nessun cambiamento di stile (layout e CSS invariati)
-
-## Note
-
-- La chiave `mm_useWeather` usa valori stringa `'yes'`/`'no'`.
-- In modalità “No”, il sistema continua a funzionare usando `currentVibe = 'sunny'` come default per la logica delle playlist.
-
-# Scelta Generi Musicali
-
-La funzionalità **Scelta Generi Musicali** permette all’utente di selezionare uno o più generi musicali per personalizzare la playlist generata.  
-La selezione è opzionale: se non viene scelto alcun genere, il sistema utilizza playlist generiche basate unicamente sulla combinazione Mood + Meteo.
-
-## Interfaccia Utente
-
-La sezione è composta da una lista di checkbox all’interno del container `#genreContainer`.  
-Ogni checkbox rappresenta un genere musicale (Pop, Rock, Lofi, Rap, Jazz, Electronic, Indie, R&B).
-
-Le selezioni effettuate vengono mostrate in tempo reale nell’elemento:
-## Raccolta dei generi selezionati
+### 4.3 Raccolta dei generi selezionati
 
 La funzione `getSelectedGenres()`:
 
-- recupera tutti i checkbox `input[name="genre"]:checked`
-- estrae i valori associati
-- ordina i valori alfabeticamente
-- restituisce un array contenente i generi selezionati
+* recupera tutti i checkbox `input[name="genre"]:checked`
+* estrae i valori associati
+* ordina i valori alfabeticamente
+* restituisce un array dei generi selezionati
 
-Esempio: ["indie", "rock"]
-## Aggiornamento del riepilogo
+**Esempio:**
+
+```
+["indie", "rock"]
+```
+
+### 4.4 Aggiornamento del riepilogo
 
 La funzione `updateGenreDisplay()` aggiorna il contenuto di `#selectedGenres`:
 
-- Nessun genere selezionato → “Nessun genere selezionato (playlist generiche)”
-- Uno o più generi selezionati → “Generi selezionati: ...”
+* Nessun genere selezionato → *"Nessun genere selezionato (playlist generiche)"*
+* Uno o più generi selezionati → *"Generi selezionati: ..."*
 
 L’aggiornamento avviene automaticamente tramite l’evento `change` su ogni checkbox.
 
-## Integrazione con la generazione playlist
+---
 
-Al momento della selezione del mood, i generi vengono integrati nella chiave utilizzata per cercare la playlist più appropriata.
+## 5. Scelta Meteo (abilita/disabilita)
 
-### Formazione della chiave:
+### 5.1 Descrizione
 
-- Nessun genere selezionato: mood_vibe
-- Uno o più generi selezionati: mood_vibe_genere1_genere2
-  (i generi sono ordinati alfabeticamente)
+La funzionalità **Scelta Meteo** consente all’utente di decidere se includere o omettere il meteo nella generazione della playlist.
 
-Esempio: happy_sunny_indie_rock
-## Sistema di fallback
+La scelta è **persistente** grazie all’utilizzo del `localStorage`.
 
-Se la chiave generata non è presente nel database `playlists`, vengono applicati i seguenti fallback:
+### 5.2 Interfaccia Utente
 
-1. Tentativo con la combinazione contenente solo il primo genere selezionato.
-2. In caso di assenza, utilizzo della playlist generica `mood_vibe`.
-3. In ultima istanza, utilizzo della playlist `fallback`.
+* Toggle meteo (radio button):
 
-## Eventi
+  * Container: `#weatherToggle`
+  * Input: `input[name="useWeather"][value="yes"|"no"]`
+  * Default: `yes`
 
-Ogni checkbox appartenente ai generi musicali è collegato alla funzione `updateGenreDisplay()` tramite evento `change`, in modo da mantenere l’interfaccia sempre aggiornata in tempo reale.
+* Sezione meteo:
 
+  * Wrapper: `#meteoSection`
+  * Titolo: `#meteoTitle`
+  * Input città: `#cityInput`
+  * Bottone fetch: `#btnMeteo`
+  * Output: `#weatherOutput`
+
+---
+
+## 6. Stato e Persistenza
+
+### 6.1 Variabili principali
+
+```js
+let currentVibe = 'sunny'
+let meteo = false
+let useWeather = true
+```
+
+### 6.2 Persistenza su localStorage
+
+* Chiave: `mm_useWeather`
+* Valori: `'yes'` | `'no'`
+
+Alla fase di `DOMContentLoaded`, il valore salvato viene letto e applicato all’interfaccia.
+
+---
+
+## 7. Logica Meteo
+
+### 7.1 Recupero meteo
+
+La funzione `getRealWeather()`:
+
+* termina immediatamente se `useWeather === false`
+* valida l’input della città
+* effettua una chiamata API a OpenWeather
+
+### 7.2 Determinazione della vibe
+
+* Temperatura < 5°C → `cold`
+* Condition ID < 700 → `rain`
+* Altrimenti → `sunny`
+
+La funzione `updateState()` aggiorna:
+
+* `currentVibe`
+* output meteo
+* stato `meteo = true`
+
+---
+
+## 8. Generazione della Playlist
+
+### 8.1 Formazione della chiave
+
+* Nessun genere selezionato:
+
+```
+mood_vibe
+```
+
+* Uno o più generi selezionati:
+
+```
+mood_vibe_genere1_genere2
+```
+
+**Esempio:**
+
+```
+happy_sunny_indie_rock
+```
+
+### 8.2 Sistema di fallback
+
+Se la chiave non è presente nel database playlist:
+
+1. Tentativo con solo il primo genere selezionato
+2. Tentativo con `mood_vibe`
+3. Playlist di fallback finale
+
+---
+
+## 9. Integrazione API Last.fm
+
+MoodMusic utilizza l’API di **Last.fm** per ricercare playlist coerenti con:
+
+* Mood selezionato
+* Vibe meteo (se attiva)
+* Generi musicali
+
+Questo garantisce suggerimenti musicali pertinenti e sempre aggiornati.
+
+---
+
+## 10. Interfaccia Grafica Dinamica
+
+* Il **colore principale della pagina** cambia in base al mood
+* Lo **sfondo cambia in base al meteo**, con effetti visivi come:
+
+  * Sole
+  * Pioggia
+  * Fulmini
+
+L’esperienza visiva rafforza il legame tra musica, emozioni e ambiente.
+
+---
+
+## 11. Comportamenti Attesi
+
+* Prima visita: meteo attivo, numerazione completa
+* Meteo disattivato: sezione nascosta, vibe forzata su `sunny`
+* Refresh pagina: stato mantenuto
+* Nessun genere selezionato: playlist generiche
+
+---
+
+## 12. Conclusione
+
+MoodMusic è un sistema di **consiglio musicale intelligente** che combina dati emotivi, ambientali e preferenze personali per creare un’esperienza musicale immersiva, personalizzata e sempre coerente con il momento dell’utente.
